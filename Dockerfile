@@ -1,5 +1,8 @@
 FROM arm64v8/debian:buster
 
-ENTRYPOINT [ "systemctl" ]
+RUN apt-get update && apt-get -y upgrade
+RUN apt-get install -y dnsmasq dhcpcd hostapd iptables
 
-CMD [ "list-unit-files" ]
+ADD ap.sh /bin/ap.sh
+
+ENTRYPOINT [ "/bin/ap.sh" ]

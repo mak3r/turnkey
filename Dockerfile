@@ -1,4 +1,4 @@
-FROM arm64v8/debian:buster
+FROM debian:buster-slim
 
 RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y dnsmasq dhcpcd hostapd iptables

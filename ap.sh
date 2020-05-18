@@ -1,6 +1,10 @@
 #!/bin/bash
 set -x
 
+ip link set wlan0 up
+ip addr flush dev wlan0
+ip addr add 192.168.4.1/24 dev wlan0
+
 # configure dhcpcd
 cat <<EOF >> /etc/dhcpcd.conf
 
@@ -20,11 +24,15 @@ EOF
 
 # Test dnsmasq config before we commit to starting it up
 /usr/sbin/dnsmasq --test
-# startup the dnsmasq service
-/etc/init.d/dnsmasq systemd-exec
-# startup resolv.conf 
-/etc/init.d/dnsmasq start_resolvconf
-
+if [ "$?" -eq "0" ]; then
+    # startup the dnsmasq service
+    /etc/init.d/dnsmasq systemd-exec
+    # startup resolv.conf 
+    /etc/init.d/dnsmasq systemd-start-resolvconf
+else
+    echo dnsmasq cannot be started
+    exit 0
+fi
 
 # setup hostapd configuration
 cat <<EOF > /etc/hostapd/hostapd.conf
@@ -50,28 +58,14 @@ EOF
 
 # fire up hostapd
 DAEMON_CONF=/etc/hostapd/hostapd.conf
-/usr/sbin/hostapd -B -P /run/hostapd.pid -B $DAEMON_OPTS ${DAEMON_CONF}
+/usr/sbin/hostapd -B -P /run/hostapd.pid ${DAEMON_CONF}
 
+wait $!
 
-# # configure network interfaces
-# cp /app/interfaces/wlan0 /etc/network/interfaces.d/.
-# cp /app/interfaces/eth0 /etc/network/interfaces.d/.
-
-# # enable ip forwarding 
-# sed -i.bak 's/\(#\)\(net\.ipv4\.ip_forward\)/\2/' /etc/sysctl.conf 
+# enable ip forwarding 
+echo "1" > /proc/sys/net/ipv4/ip_forward
 
 # setup a MASQUERADE for traffic talking to this gateway
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
 # save the rule
 iptables-save > /etc/iptables.ipv4.nat
-
-# make sure the iptables rule sticks on boot
-cp /etc/rc.local /etc/rc.local.orig
-sed -i.bak '0,/^exit 0/s/^exit 0/iptables-restore < \/etc\/iptables\.ipv4\.nat\n&/'  /etc/rc.local
-# sed -i.bak '0,/^exit 0/s/^exit 0/\/usr\/bin\/python3 \/var\/lib\/rancher\/turnkey\/startup.py\n&/'  /etc/rc.local
-
-# # setup a tmp log for rc.local just in case the prior commands need debugging
-# sed -i.bak '0,/^$/s/^$/exec 2> \/tmp\/rc.local.log      # send stderr from rc.local to a log file\n&/' /etc/rc.local
-# sed -i.bak '0,/^$/s/^$/exec 1>&2                      # send stdout to the same log file\n&/' /etc/rc.local
-# sed -i.bak '0,/^$/s/^$/set -x                         # tell sh to display commands before execution\n&/' /etc/rc.local
-

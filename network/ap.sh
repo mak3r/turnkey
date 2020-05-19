@@ -12,13 +12,13 @@ function init()
 EOF
 
     # Create a new dnsmasq configuration for this device
-    cat <<EOF >> /etc/dnsmasq.conf
+    cat <<-EOF >> /etc/dnsmasq.conf
     interface=wlan0
     dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
 EOF
 
     # setup hostapd configuration
-    cat <<EOF > /etc/hostapd/hostapd.conf
+    cat <<-EOF > /etc/hostapd/hostapd.conf
     interface=wlan0
     driver=nl80211
     ssid=ConfigureK3s

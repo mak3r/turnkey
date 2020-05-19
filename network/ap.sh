@@ -3,41 +3,41 @@ set -x
 
 function init()
 {
-    # configure dhcpcd
-    cat <<-'EOF' >> /etc/dhcpcd.conf
+	# configure dhcpcd
+	cat <<-'EOF' >> /etc/dhcpcd.conf
 
-    interface wlan0
-        static ip_address=192.168.4.1/24
-        nohook wpa_supplicant 
-EOF
+	interface wlan0
+	    static ip_address=192.168.4.1/24
+	    nohook wpa_supplicant 
+	EOF
 
-    # Create a new dnsmasq configuration for this device
-    cat <<-EOF >> /etc/dnsmasq.conf
-    interface=wlan0
-    dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
-EOF
+	# Create a new dnsmasq configuration for this device
+	cat <<-EOF >> /etc/dnsmasq.conf
+	interface=wlan0
+	dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
+	EOF
 
-    # setup hostapd configuration
-    cat <<-EOF > /etc/hostapd/hostapd.conf
-    interface=wlan0
-    driver=nl80211
-    ssid=ConfigureK3s
-    hw_mode=a
-    channel=44
-    ieee80211d=1
-    country_code=US
-    ieee80211n=1
-    ieee80211ac=1
-    wmm_enabled=0
-    macaddr_acl=0
-    auth_algs=1
-    ignore_broadcast_ssid=0
-    wpa=2
-    wpa_passphrase=rancher-k3s
-    wpa_key_mgmt=WPA-PSK
-    wpa_pairwise=TKIP
-    rsn_pairwise=CCMP
-EOF
+	# setup hostapd configuration
+	cat <<-EOF > /etc/hostapd/hostapd.conf
+	interface=wlan0
+	driver=nl80211
+	ssid=ConfigureK3s
+	hw_mode=a
+	channel=44
+	ieee80211d=1
+	country_code=US
+	ieee80211n=1
+	ieee80211ac=1
+	wmm_enabled=0
+	macaddr_acl=0
+	auth_algs=1
+	ignore_broadcast_ssid=0
+	wpa=2
+	wpa_passphrase=rancher-k3s
+	wpa_key_mgmt=WPA-PSK
+	wpa_pairwise=TKIP
+	rsn_pairwise=CCMP
+	EOF
 
 }
 

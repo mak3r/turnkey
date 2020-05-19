@@ -14,7 +14,7 @@ interface wlan0
 EOF
 
 # configuration done, restart dhcpcd
-/usr/lib/dhcpcd5/dhcpcd -q -b
+/usr/sbin/dhcpcd -q -b
 
 # Create a new dnsmasq configuration for this device
 cat <<EOF >> /etc/dnsmasq.conf

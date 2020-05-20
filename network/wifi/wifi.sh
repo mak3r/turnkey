@@ -27,10 +27,9 @@ function wifi_up()
 function scan()
 {
 	ip_up
-	ssids=$(iwlist wlan0 scan | grep "ESSID" | sort | uniq | sed 's/\"//g' | awk -F: '{print $2}')
+	echo '' > /var/lib/rancher/turnkey/ssid.list
+	ssids=$(iwlist wlan0 scan | grep "ESSID" | sort | uniq | sed 's/\"//g' | awk -F: '{print $2}' >> ssid.list)
 	wait $!
-
-	cat $ssids > /var/lib/rancher/turnkey/ssid.list
 
 	wifi_down
 }

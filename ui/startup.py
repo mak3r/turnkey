@@ -29,7 +29,7 @@ ssid_list = []
 def getssid():
     global ssid_list
     logger.debug('entered getssid()')
-    with open("/tmp/ssid.list", 'r') as f:
+    with open("/var/lib/rancher/turnkey/ssid.list", 'r') as f:
         ssids = f.read()
         for s in ssids:
             s = s.strip().decode('utf-8')

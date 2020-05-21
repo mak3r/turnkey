@@ -5,6 +5,7 @@ RUN apt-get install -y python3-flask python3-requests
 
 WORKDIR /app
 ADD startup.py /app/startup.py
+VOLUME [ "/tmp" ]
 
 ENTRYPOINT [ "/usr/bin/python3" ]
 

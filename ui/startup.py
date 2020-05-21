@@ -29,15 +29,15 @@ ssid_list = []
 def getssid():
     global ssid_list
     logger.debug('entered getssid()')
-	with open("/tmp/ssid.list", 'r') as ssids
-		for s in ssids:
-			s = s.strip().decode('utf-8')
-			if s.startswith("SSID"):
-				a = s.split(": ")
-				try:
-					ssid_list.append(a[1])
-				except:
-					pass
+    with open("/tmp/ssid.list", 'r') as ssids
+        for s in ssids:
+            s = s.strip().decode('utf-8')
+            if s.startswith("SSID"):
+                a = s.split(": ")
+                try:
+                    ssid_list.append(a[1])
+                except:
+                    pass
 
     logger.debug(ssid_list)
     ssid_list = sorted(list(set(ssid_list)))

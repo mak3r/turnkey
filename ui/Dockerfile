@@ -6,6 +6,7 @@ RUN apt-get install -y python3-flask python3-requests
 WORKDIR /app
 ADD startup.py /app/startup.py
 ADD templates /app/templates
+ADD css /app/css
 VOLUME [ "/var/lib/rancher/turnkey" ]
 ENV FLASK_ENV development
 

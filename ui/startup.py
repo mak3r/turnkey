@@ -103,7 +103,6 @@ def runapp():
     app.run(host="0.0.0.0", port=80, threaded=True)
 
 if __name__ == "__main__":
-    global piid
     piid = getUniqueId()
     # fire up the input form
     runapp()

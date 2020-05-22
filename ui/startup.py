@@ -26,23 +26,13 @@ os.chdir(currentdir)
 project='none'
 piid = ''
 
-ssid_list = []
 def getssid():
-    global ssid_list
     logger.debug('entered getssid()')
+    ssid_list = []
     with open("/var/lib/rancher/turnkey/ssid.list", 'r') as f:
         ssids = f.read()
-        for s in ssids:
-            s = s.strip().decode('utf-8')
-            if s.startswith("SSID"):
-                a = s.split(": ")
-                try:
-                    ssid_list.append(a[1])
-                except:
-                    pass
-
+        ssid_list = ssids.split('\n')
     logger.debug(ssid_list)
-    ssid_list = sorted(list(set(ssid_list)))
     return ssid_list
 
 def getProjectList():
@@ -93,7 +83,6 @@ def send_static(path):
 @app.route('/signin', methods=['POST'])
 def signin():
     global project
-    global piid
 
     logger.debug('entered signin()')
     email = request.form['email']

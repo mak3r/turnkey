@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker run -it --rm --privileged --net=host mak3r/hostapd:simple
+docker run -it --rm --privileged --net=host --name hostapd mak3r/hostapd:simple

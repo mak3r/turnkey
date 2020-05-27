@@ -38,6 +38,7 @@ function reset()
 {
 	init
 	wifi_down
+	wait $!
 	wifi_up
 }
 

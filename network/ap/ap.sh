@@ -86,6 +86,7 @@ function reset()
 {
     # TODO: RELOAD CONFIGURATION FILES
     ap_down
+	wait $!
     ap_up
 }    
 
@@ -93,7 +94,7 @@ trap ap_down SIGTERM
 trap reset SIGUSR1
 
 init
-ap_up
+reset
 while true
 do
     sleep 10

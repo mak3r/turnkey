@@ -1,6 +1,13 @@
 #!/bin/bash
 set -x
 
+while getopts h flag
+do
+    case "${flag}" in
+        h) echo "ap.sh [up|down|reset|init]";;
+    esac
+done
+
 function init()
 {
 	# configure dhcpcd
@@ -93,8 +100,18 @@ function reset()
 trap ap_down SIGTERM
 trap reset SIGUSR1
 
-init
-reset
+if [ "$1" -eq "reset" || "$1" -eq "init" ] 
+then
+	init
+	reset
+elif [ "$1" -eq "down" ]
+then
+	ap_down
+elif [ "$1" -eq "up" ]
+then
+	ap_up
+fi
+
 while true
 do
     sleep 10

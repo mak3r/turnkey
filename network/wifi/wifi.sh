@@ -1,6 +1,13 @@
 #!/bin/bash
 set -x
 
+while getopts h flag
+do
+    case "${flag}" in
+        h) echo "wifi.sh [up|down|reset|scan|init]";;
+    esac
+done
+
 function init()
 {
 	# wpa_supplicant.conf must come from an external source
@@ -45,8 +52,21 @@ function reset()
 trap wifi_down SIGTERM
 trap reset SIGUSR1
 
-init
-scan
+if [ "$1" -eq "scan" || "$1" -eq "init" ] 
+then
+	init
+	scan
+elif [ "$1" -eq "down" ]
+then
+	wifi_down
+elif [ "$1" -eq "up" ]
+then
+	wifi_up
+elif [ "$1" -eq "reset" ]
+then
+	reset
+fi
+
 while true
 do
     sleep 10

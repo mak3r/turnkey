@@ -4,7 +4,9 @@ set -x
 while getopts h flag
 do
     case "${flag}" in
-        h) echo "ap.sh [up|down|reset|init]";;
+        h) echo "ap.sh [up|down|reset|init]"; 
+			exit 0
+			;;
     esac
 done
 
@@ -59,7 +61,7 @@ function ap_up()
 
     # Test dnsmasq config before we commit to starting it up
     /usr/sbin/dnsmasq --test
-    if [ "$?" -eq "0" ]; then
+    if [ "$?" == "0" ]; then
         # startup the dnsmasq service
         /etc/init.d/dnsmasq systemd-exec
         # startup resolv.conf 
@@ -100,14 +102,14 @@ function reset()
 trap ap_down SIGTERM
 trap reset SIGUSR1
 
-if [ "$1" -eq "reset" || "$1" -eq "init" ] 
+if [ "$1" == "reset" ] || [ "$1" == "init" ] 
 then
 	init
 	reset
-elif [ "$1" -eq "down" ]
+elif [ "$1" == "down" ]
 then
 	ap_down
-elif [ "$1" -eq "up" ]
+elif [ "$1" == "up" ]
 then
 	ap_up
 fi

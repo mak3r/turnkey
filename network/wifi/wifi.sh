@@ -4,7 +4,9 @@ set -x
 while getopts h flag
 do
     case "${flag}" in
-        h) echo "wifi.sh [up|down|reset|scan|init]";;
+        h) echo "wifi.sh [up|down|reset|scan|init]"
+			exit 0
+			;;
     esac
 done
 
@@ -52,17 +54,17 @@ function reset()
 trap wifi_down SIGTERM
 trap reset SIGUSR1
 
-if [ "$1" -eq "scan" || "$1" -eq "init" ] 
+if [ "$1" == "scan" ] || [ "$1" == "init" ] 
 then
 	init
 	scan
-elif [ "$1" -eq "down" ]
+elif [ "$1" == "down" ]
 then
 	wifi_down
-elif [ "$1" -eq "up" ]
+elif [ "$1" == "up" ]
 then
 	wifi_up
-elif [ "$1" -eq "reset" ]
+elif [ "$1" == "reset" ]
 then
 	reset
 fi

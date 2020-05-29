@@ -35,9 +35,11 @@ spec:
         name: hostapd
         resources: {}
         securityContext:
-          allowPrivilegeEscalation: true
-          capabilities: {}
-          privileged: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            add:
+            - NET_ADMIN
+          privileged: false
           readOnlyRootFilesystem: false
           runAsNonRoot: false
         stdin: true

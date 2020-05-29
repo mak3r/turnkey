@@ -1,7 +1,10 @@
 ---
 apiVersion: v1
 kind: Namespace
+metadata:
   name: turnkey
+  labels:
+    name: turnkey
 
 ---
 apiVersion: apps/v1
@@ -142,10 +145,10 @@ metadata:
 spec:
   ports:
   - name: 80tcp01-ui
-  port: 80
-  protocol: TCP
-  targetPort: 80
+    port: 80
+    protocol: TCP
+    targetPort: 80
   selector:
-  turnkey/workloadselector: deployment-turnkey-ui
+    turnkey/workloadselector: deployment-turnkey-ui
   sessionAffinity: None
   type: ClusterIP

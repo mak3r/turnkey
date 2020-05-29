@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostapd
+  namespace: turnkey
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      turnkey/workloadselector: deployment-turnkey-hostapd
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        turnkey/workloadselector: deployment-turnkey-hostapd
+    spec:
+      containers:
+      - image: mak3r/hostapd:latest
+        imagePullPolicy: Always
+        name: hostapd
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities: {}
+          privileged: true
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+      dnsConfig: {}
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+  namespace: turnkey
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      turnkey/workloadselector: deployment-turnkey-ui
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        turnkey/workloadselector: deployment-turnkey-ui
+    spec:
+      initContainers:
+        - args:
+          - scan
+          image: mak3r/wifi:latest
+          imagePullPolicy: Always
+          name: ssid-scan
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+              - NET_ADMIN
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          stdin: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+          volumeMounts:
+          - mountPath: /var/lib/rancher/turnkey
+            name: vol1
+      containers:
+      - image: mak3r/turnkey-ui:latest
+        imagePullPolicy: Always
+        name: ui
+        ports:
+        - containerPort: 80
+          hostPort: 80
+          name: 80tcp800
+          protocol: TCP
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: {}
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: /var/lib/rancher/turnkey
+          name: vol1
+        - mountPath: /etc/machine-id
+          name: vol2
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /tmp
+          type: Directory
+        name: vol1
+      - hostPath:
+          path: /etc/machine-id
+          type: File
+        name: vol2
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui
+  namespace: turnkey
+spec:
+  ports:
+  - name: 80tcp01-ui
+  port: 80
+  protocol: TCP
+  targetPort: 80
+  selector:
+  turnkey/workloadselector: deployment-turnkey-ui
+  sessionAffinity: None
+  type: ClusterIP
+
+---

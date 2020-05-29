@@ -13,7 +13,7 @@ done
 function init()
 {
 	# wpa_supplicant.conf must come from an external source
-	cp /var/lib/rancher/turnkey/wpa_supplicant.conf /etc/wpa_supplicant.conf
+	cp /var/lib/rancher/turnkey/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
 }
 
 function ip_up()
@@ -31,11 +31,16 @@ function wifi_up()
 {
 	ip_up
 	/sbin/wpa_supplicant -iwlan0 -c/etc/wpa_supplicant/wpa_supplicant.conf -u -s
+	while true
+	do
+		sleep 10
+	done
 }
 
 function scan()
 {
 	ip_up
+	# Clear the ssid list before writing it out again
 	echo '' > /var/lib/rancher/turnkey/ssid.list
 	$(iwlist wlan0 scan | grep "ESSID" | sort | uniq | sed 's/\"//g' | awk -F: '{print $2}' >> /var/lib/rancher/turnkey/ssid.list)
 	wait $!
@@ -54,9 +59,8 @@ function reset()
 trap wifi_down SIGTERM
 trap reset SIGUSR1
 
-if [ "$1" == "scan" ] || [ "$1" == "init" ] 
+if [ "$1" == "scan" ]
 then
-	init
 	scan
 elif [ "$1" == "down" ]
 then
@@ -68,8 +72,3 @@ elif [ "$1" == "reset" ]
 then
 	reset
 fi
-
-while true
-do
-    sleep 10
-done

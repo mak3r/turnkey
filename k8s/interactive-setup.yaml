@@ -1,3 +1,9 @@
+---
+apiVersion: v1
+kind: Namespace
+  name: turnkey
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -143,5 +149,3 @@ spec:
   turnkey/workloadselector: deployment-turnkey-ui
   sessionAffinity: None
   type: ClusterIP
-
----

@@ -6,15 +6,20 @@ What if we could simply ship a device the provides the site owner to simply plug
 Today we can.
 
 # Basic usage
+## Setup - admins
 1. Install k3s
 1. Add [k8s/interactive-setup.yaml] to the manifest directory
 1. Image the sd card for use in other devices
+
+## Users
 1. When a device is shipped to the site
-    1. plugin
-    1. connect to the AP
+    1. plug it in
+	1. From another device (phone, computer, etc) connect to the AP
         * ssid: `ConfigureK3s`
         * passphrase: `rancher-k3s` 
-1. Set your network credentials
+    1. Navigate to 192.168.4.1
+1. Set your network credentials in the form and submit
+    * When the device comes back up, it will have installed / deployed the selected configuration
 
 # Current todo list:
 1. docs
@@ -26,5 +31,6 @@ Today we can.
 
 # Caveats
 * This is an example designed specificially for Raspberry Pi 4B devices running Raspbian with a 64bit kernel. It has not been tested as a generic solution for other OSes/devices.
+* device must have a wireless card/chip capable of entering AP mode
 
 

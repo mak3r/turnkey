@@ -41,7 +41,7 @@ function scan()
 {
 	ip_up
 	# Clear the ssid list before writing it out again
-	echo '' > /var/lib/rancher/turnkey/ssid.list
+	printf '' > /var/lib/rancher/turnkey/ssid.list
 	$(iwlist wlan0 scan | grep "ESSID" | sort | uniq | sed 's/\"//g' | awk -F: '{print $2}' >> /var/lib/rancher/turnkey/ssid.list)
 	wait $!
 

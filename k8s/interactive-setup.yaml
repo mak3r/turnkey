@@ -44,6 +44,18 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         tty: true
+      initContainers:
+      - name: ssids-listed
+        image: busybox:1.28
+        command: ['sh', '-c', "until [ $(wc -l /var/lib/rancher/turnkey/ssid.list | awk '{print $1}') -gt 0 ]; do echo waiting for wifi ap list; sleep 2; done"]
+        volumeMounts:
+          - mountPath: /var/lib/rancher/turnkey/ssid.list
+            name: ssids
+      volumes:
+      - hostPath:
+          path: /tmp/ssid.list
+          type: File
+        name: ssids
       dnsConfig: {}
       dnsPolicy: ClusterFirst
       hostNetwork: true
@@ -124,6 +136,7 @@ spec:
           name: vol2
       dnsPolicy: ClusterFirst
       restartPolicy: Always
+      hostNetwork: true
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30

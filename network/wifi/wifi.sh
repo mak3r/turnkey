@@ -4,17 +4,11 @@ set -x
 while getopts h flag
 do
     case "${flag}" in
-        h) echo "wifi.sh [up|down|reset|scan|init]"
+        h) echo "wifi.sh [up|down|reset|scan]"
 			exit 0
 			;;
     esac
 done
-
-function init()
-{
-	# wpa_supplicant.conf must come from an external source
-	cp /var/lib/rancher/turnkey/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
-}
 
 function ip_up()
 {
@@ -30,7 +24,11 @@ function wifi_down()
 function wifi_up()
 {
 	ip_up
-	/sbin/wpa_supplicant -iwlan0 -c/etc/wpa_supplicant/wpa_supplicant.conf -u -s
+	/sbin/wpa_supplicant -iwlan0 -c/etc/wpa_supplicant/wpa_supplicant.conf
+	wait $!
+	ip addr flush dev wlan0
+
+	set +x
 	while true
 	do
 		sleep 10
@@ -50,7 +48,6 @@ function scan()
 
 function reset()
 {
-	init
 	wifi_down
 	wait $!
 	wifi_up

@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  wpa_supplicant.conf: MAK3R
+kind: Secret
+metadata:
+  name: wpa-supplicant-conf
+  namespace: turnkey
+type: Opaque

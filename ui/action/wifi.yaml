@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wifi
+  namespace: turnkey
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      turnkey/workloadselector: deployment-turnkey-wifi
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        turnkey/workloadselector: deployment-turnkey-wifi
+    spec:
+      containers:
+      - args:
+        - up
+        image: mak3r/wifi:v0.0.4
+        imagePullPolicy: IfNotPresent
+        name: wifi
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            add:
+            - NET_ADMIN
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: /etc/wpa_supplicant/
+          name: vol1
+      dnsConfig: {}
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: vol1
+        secret:
+          defaultMode: 256
+          items:
+          - key: wpa_supplicant.conf
+            mode: 420
+            path: wpa_supplicant.conf
+          optional: false
+          secretName: wpa-supplicant-conf

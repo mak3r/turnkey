@@ -4,51 +4,12 @@ set -x
 while getopts h flag
 do
     case "${flag}" in
-        h) echo "ap.sh [up|down|reset|init]"; 
+        h) echo "ap.sh [up|down|reset]"; 
 			exit 0
 			;;
     esac
 done
 
-function init()
-{
-	# configure dhcpcd
-	cat <<-'EOF' >> /etc/dhcpcd.conf
-
-	interface wlan0
-	    static ip_address=192.168.4.1/24
-	    nohook wpa_supplicant 
-	EOF
-
-	# Create a new dnsmasq configuration for this device
-	cat <<-EOF >> /etc/dnsmasq.conf
-	interface=wlan0
-	dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
-	EOF
-
-	# setup hostapd configuration
-	cat <<-EOF > /etc/hostapd/hostapd.conf
-	interface=wlan0
-	driver=nl80211
-	ssid=ConfigureK3s
-	hw_mode=a
-	channel=44
-	ieee80211d=1
-	country_code=US
-	ieee80211n=1
-	ieee80211ac=1
-	wmm_enabled=0
-	macaddr_acl=0
-	auth_algs=1
-	ignore_broadcast_ssid=0
-	wpa=2
-	wpa_passphrase=rancher-k3s
-	wpa_key_mgmt=WPA-PSK
-	wpa_pairwise=TKIP
-	rsn_pairwise=CCMP
-	EOF
-
-}
 
 function ap_up()
 {
@@ -68,14 +29,20 @@ function ap_up()
         /etc/init.d/dnsmasq systemd-start-resolvconf
     else
         echo dnsmasq cannot be started
-        exit 0
+        exit 1
     fi
 
     # fire up hostapd
     DAEMON_CONF=/etc/hostapd/hostapd.conf
-    /usr/sbin/hostapd -B -P /run/hostapd.pid ${DAEMON_CONF}
+    /usr/sbin/hostapd -B -f /root/hostapd.out ${DAEMON_CONF}
 
     wait $!
+
+	if grep -e "Unable to setup interface" /root/hostapd.out; then
+		exit 1
+	fi 
+	# flush the network adapter after hostapd comes up
+	ip addr flush dev wlan0
 
     # enable ip forwarding 
     echo "1" > /proc/sys/net/ipv4/ip_forward
@@ -93,7 +60,6 @@ function ap_down()
 
 function reset()
 {
-    # TODO: RELOAD CONFIGURATION FILES
     ap_down
 	wait $!
     ap_up
@@ -102,9 +68,8 @@ function reset()
 trap ap_down SIGTERM
 trap reset SIGUSR1
 
-if [ "$1" == "reset" ] || [ "$1" == "init" ] 
+if [ "$1" == "reset" ] 
 then
-	init
 	reset
 elif [ "$1" == "down" ]
 then
@@ -114,7 +79,35 @@ then
 	ap_up
 fi
 
-while true
+# Status
+# up - hostapd service should be up
+# down - exit 
+# sleep - hostapd service should be down, maintain listening loop
+status='up'
+cur=$status
+prev=$status
+until [ "$status" == "down" ]
 do
-    sleep 10
+	status=$(cat /var/lib/rancher/turnkey/status)
+	cur=$status
+	if [ "$status" == "sleep" ] && [ "$cur" != "$prev" ]
+	then
+		# continue logging
+		set -x
+		ap_down
+	elif [ "$status" == "up" ] && [ "$cur" != "$prev" ]
+	then 
+		# continue logging
+		set -x
+		ap_up
+	fi
+	prev=$cur
+
+	sleep 5
+	# stop debugging at the end of the loop
+	set +x
 done
+
+set -x
+# be sure the ap is down when exiting
+ap_down

@@ -44,6 +44,14 @@ chmod +x /usr/local/bin/turnkey-reset.sh
 curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/k8s/turnkey-ns.yaml" -o /var/lib/rancher/turnkey/turnkey-ns.yaml
 curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/k8s/interactive-setup.yaml" -o /var/lib/rancher/turnkey/interactive-setup.yaml
 
+# Remove turnkey process communication files
+if [ -f /tmp/status ]; then
+	rm /tmp/status
+fi
+if [ -f /tmp/ssid.list ]; then
+	rm /tmp/ssid.list
+fi
+
 # remove any prior installation of k3s
 /usr/local/bin/k3s-uninstall.sh
 
@@ -51,6 +59,9 @@ curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/k8s/int
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--tls-san raspberrypi --write-kubeconfig /home/pi/.kube/config --no-deploy servicelb --resolv-conf /var/lib/rancher/turnkey/resolv.conf" sh -
 
 wait $!
+JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}' \
+ && kubectl get nodes -o jsonpath="$JSONPATH" | grep "Ready=True"
+
 
 cp /var/lib/rancher/turnkey/turnkey-ns.yaml /var/lib/rancher/k3s/server/manifests/turnkey-ns.yaml
 cp /var/lib/rancher/turnkey/interactive-setup.yaml /var/lib/rancher/k3s/server/manifests/interactive-setup.yaml
@@ -58,7 +69,31 @@ cp /var/lib/rancher/turnkey/interactive-setup.yaml /var/lib/rancher/k3s/server/m
 # ideally we could detect when the turnkey images have finished downloading
 # or better yet, resolve with air-gap installation 
 # https://github.com/rancher/k3s/issues/1285
-#systemctl stop k3s
+images=("busybox" "hostapd" "turnkey-ui" "wifi" "coredns" "klipper-helm" "traefik" "local-path-provisioner" "metrics-server" "pause")
+for img in ${images[@]}; do
+	echo "verifying $img is installed"
+	while ! crictl images | grep -e $img; do
+		sleep 10
+	done
+done
+
+# remove turnkey yaml for image prep
+rm /var/lib/rancher/k3s/server/manifests/interactive-setup.yaml
+kubectl delete job -n turnkey hostapd
+wait $!
+kubectl delete job -n turnkey ui
+wait $!
+
+## prepare to load turnkey back in
+systemctl stop k3s
+rm /tmp/ssid.list
+rm /tmp/status
+
+# move turnkey yaml back in prior to reboot
+cp /var/lib/rancher/turnkey/interactive-setup.yaml /var/lib/rancher/k3s/server/manifests/interactive-setup.yaml
+
+echo "Image is prepped."
+
 
 if [[ "1" == "$RESTART" ]]; then
 	reboot now

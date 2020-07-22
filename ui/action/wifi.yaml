@@ -23,7 +23,7 @@ spec:
       containers:
       - args:
         - up
-        image: mak3r/wifi:v0.0.4
+        image: mak3r/wifi:v0.0.9
         imagePullPolicy: IfNotPresent
         name: wifi
         resources: {}
@@ -42,13 +42,22 @@ spec:
         volumeMounts:
         - mountPath: /etc/wpa_supplicant/
           name: vol1
+        - mountPath: /var/lib/rancher/turnkey/resolv.conf
+          name: vol2
       dnsConfig: {}
       dnsPolicy: ClusterFirst
       hostNetwork: true
+      hostPID: true
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      livenessProbe:
+        exec:
+          command:
+            - /usr/local/bin/liveness.sh
+        initialDelaySeconds: 20
+        periodSeconds: 5
       volumes:
       - name: vol1
         secret:
@@ -59,3 +68,7 @@ spec:
             path: wpa_supplicant.conf
           optional: false
           secretName: wpa-supplicant-conf
+      - name: vol2
+        hostPath:
+          path: /var/lib/rancher/turnkey/resolv.conf
+          type: File

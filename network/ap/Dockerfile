@@ -8,6 +8,8 @@ RUN rm /etc/dnsmasq.conf /etc/dhcpcd.conf; \
   ln -s /conf/hostapd.conf /etc/hostapd/hostapd.conf
 
 ADD entrypoint.sh /usr/local/bin/entrypoint.sh
+ADD liveness.sh /usr/local/bin/liveness.sh
+
 WORKDIR /root
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

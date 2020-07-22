@@ -43,14 +43,6 @@ function ap_up()
 	fi 
 	# flush the network adapter after hostapd comes up
 	ip addr flush dev wlan0
-
-    # enable ip forwarding 
-    echo "1" > /proc/sys/net/ipv4/ip_forward
-
-    # setup a MASQUERADE for traffic talking to this gateway
-    iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
-    # save the rule
-    iptables-save > /etc/iptables.ipv4.nat
 }
 
 function ap_down()

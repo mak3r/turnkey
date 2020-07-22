@@ -5,7 +5,6 @@ Specialists might have expertise in networking or even be trained in the unique 
 
 Today, we can very simply ship a device which provides a turnkey solution that is simple enough for non-technical site owners and managers to use. The advent of home automation and smart devices has paved the way for expectations of simplicity in this manner. K3s and container orchestration provide a platform to deliver.
 
-
 This repository hosts and example solution for delivering a small device to end-users who simply plug it in and provide credentials to their local network. In this example, we are creating and shipping a device whose end-user wants to have an easy to access edge kubernetes solution. The solution, when complete will provide 4 options for the end user:
 1. Administrative access to a single node k3s cluster on the device
 1. Admin access to a single node Rancher management server
@@ -41,6 +40,12 @@ Here are some recommended options
 	domain lan
 	nameserver 192.168.1.1
 	```
+1. Stop k3s `sudo systemctl stop k3s`
+1. Remove the turnkey communication files
+	* This clear previously scanned network entries
+	* `rm /tmp/ssid.list`
+	* `rm /tmp/status`
+
 1. Image the sd card for use in other devices
 
 # Usage
@@ -58,5 +63,10 @@ Here are some recommended options
 * This is an example designed specificially for Raspberry Pi 4B devices running Raspbian with a 64bit kernel. It has not been tested as a generic solution for other OSes/devices.
 * The device must have a wireless card/chip capable of entering AP mode
 
+* The project is configured such that the wifi network is always managed by kubernetes
+	* it is possible to pass the network configuration to the host so it becomes permanent - it's just not done in this example
+	* this example assumes an end user might want to demo this on different wifi networks repeatedly
+
 ## Special thanks
 * The UI was pulled from https://github.com/schollz/raspberry-pi-turnkey
+

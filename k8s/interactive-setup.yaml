@@ -13,7 +13,7 @@ spec:
       containers:
       - args:
         - up
-        image: mak3r/hostapd:v0.0.9
+        image: mak3r/hostapd:v0.0.10
         imagePullPolicy: IfNotPresent
         name: hostapd
         resources: {}
@@ -84,7 +84,7 @@ spec:
       initContainers:
         - args:
           - scan
-          image: mak3r/wifi:v0.0.4
+          image: mak3r/wifi:v0.0.9
           imagePullPolicy: IfNotPresent
           name: ssid-scan
           resources: {}
@@ -101,10 +101,10 @@ spec:
           terminationMessagePolicy: File
           tty: true
           volumeMounts:
-          - mountPath: /var/lib/rancher/turnkey
+          - mountPath: /tmp
             name: vol1
       containers:
-      - image: mak3r/turnkey-ui:v0.0.16
+      - image: mak3r/turnkey-ui:v0.0.22
         imagePullPolicy: IfNotPresent
         name: ui
         ports:
@@ -186,11 +186,11 @@ data:
     macaddr_acl=0
     auth_algs=1
     ignore_broadcast_ssid=0
-    wpa=2
-    wpa_passphrase=rancher-k3s
-    wpa_key_mgmt=WPA-PSK
-    wpa_pairwise=TKIP
-    rsn_pairwise=CCMP
+    #wpa=2
+    #wpa_passphrase=rancher-k3s
+    #wpa_key_mgmt=WPA-PSK
+    #wpa_pairwise=TKIP
+    #rsn_pairwise=CCMP
   dnsmasq.conf: |
     interface=wlan0
     dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h

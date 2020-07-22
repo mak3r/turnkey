@@ -117,15 +117,14 @@ def signin():
 
 @app.route('/restart', methods=['POST'])
 def restart():
-    # set status down
-    with open('/var/lib/rancher/turnkey/status', 'w') as f:
-        f.write('down')
     # bring up wifi
     with open('/app/action/wifi.yaml', 'r') as f:
         wifi_yaml = yaml.safe_load(f)
     with open('/var/lib/rancher/k3s/server/manifests/wifi.yaml', 'w') as f:
         yaml.dump(wifi_yaml, f)
-    # TODO: bring down ui
+    # set status down
+    with open('/var/lib/rancher/turnkey/status', 'w') as f:
+        f.write('down')
     shutdown_server()
     return 'Server shutting down...'
 

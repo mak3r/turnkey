@@ -1,6 +1,6 @@
 #!/bin/sh
-if ! ip addr show wlan0 | grep -e "inet"; then
-	exit 1;
-else
-	exit 0;
-fi
+wlan0_ip=$(ip r | grep -e "default" | grep -e "wlan0" | awk '{print $3}')
+
+# Check if the gateway accessible via the nic used
+# do not assume the network beyond the gw is visible
+ping -c 3 $wlan0_ip

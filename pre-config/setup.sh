@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function usage() {
       echo "Usage: $0 [bhr] "
@@ -41,6 +41,8 @@ mkdir -p /var/lib/rancher/turnkey
 curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/pre-config/resolv.conf" -o /var/lib/rancher/turnkey/resolv.conf
 curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/pre-config/turnkey-reset.sh" -o /usr/local/bin/turnkey-reset.sh
 chmod +x /usr/local/bin/turnkey-reset.sh
+curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/pre-config/turnkey-reset.service" -o /etc/systemd/system/turnkey-reset.service
+systemctl enable turnkey-reset.service
 curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/k8s/turnkey-ns.yaml" -o /var/lib/rancher/turnkey/turnkey-ns.yaml
 curl -L "https://raw.githubusercontent.com/mak3r/turnkey/$TURNKEY_BRANCH/k8s/interactive-setup.yaml" -o /var/lib/rancher/turnkey/interactive-setup.yaml
 
@@ -69,7 +71,7 @@ cp /var/lib/rancher/turnkey/interactive-setup.yaml /var/lib/rancher/k3s/server/m
 # ideally we could detect when the turnkey images have finished downloading
 # or better yet, resolve with air-gap installation 
 # https://github.com/rancher/k3s/issues/1285
-images=("busybox" "hostapd" "turnkey-ui" "wifi" "coredns" "klipper-helm" "traefik" "local-path-provisioner" "metrics-server" "pause")
+images=("busybox" "pause" "coredns" "traefik" "klipper-helm" "local-path-provisioner" "metrics-server" "turnkey-ui" "wifi" "hostapd")
 for img in ${images[@]}; do
 	echo "verifying $img is installed"
 	while ! crictl images | grep -e $img; do

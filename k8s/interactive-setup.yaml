@@ -84,7 +84,7 @@ spec:
       initContainers:
         - args:
           - scan
-          image: mak3r/wifi:v0.0.9
+          image: mak3r/wifi:v0.0.10
           imagePullPolicy: IfNotPresent
           name: ssid-scan
           resources: {}
@@ -103,8 +103,14 @@ spec:
           volumeMounts:
           - mountPath: /tmp
             name: vol1
+        - name: has-networks
+          volumeMounts:
+            - mountPath: /tmp
+              name: vol1
+          image: busybox:1.28
+          command: ['grep', '-E', '[^\s]', /tmp/ssid.list]
       containers:
-      - image: mak3r/turnkey-ui:v0.0.22
+      - image: mak3r/turnkey-ui:v0.0.24
         imagePullPolicy: IfNotPresent
         name: ui
         ports:

@@ -23,10 +23,23 @@ spec:
       containers:
       - args:
         - up
-        image: mak3r/wifi:v0.0.9
+        image: mak3r/wifi:v0.0.10
         imagePullPolicy: IfNotPresent
         name: wifi
         resources: {}
+        livenessProbe:
+          exec:
+            command:
+              - /usr/local/bin/liveness.sh
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+              - /usr/local/bin/readiness.sh
+          initialDelaySeconds: 20
+          periodSeconds: 5
         securityContext:
           allowPrivilegeEscalation: true
           capabilities:
@@ -52,12 +65,6 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      livenessProbe:
-        exec:
-          command:
-            - /usr/local/bin/liveness.sh
-        initialDelaySeconds: 20
-        periodSeconds: 5
       volumes:
       - name: vol1
         secret:

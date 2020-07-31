@@ -17,13 +17,13 @@
   </head>
 
   <body>
-    <form class="form-signin" action="/restart" method="POST">
-      <div class="text-left mb-4">
-       <h1 class="h3 mb-3 font-weight-normal">Connect WiFi</h1>
-        {% if message %}<p>{{ message|safe }}</p>{% endif %}
+      <div class="text-center mb-3 mt-5">
+	   <h1>Access K3s</h1>
+	     <div class="text-left mb-3 ml-3 mr-3 font-weight-normal">
+			{% if message %}<p>{{ message|safe }}</p>{% endif %}
+		 </div>
+		 <p class="mt-5 mb-3 text-muted text-center"><a href="https://github.com/mak3r/turnkey">Rancher Turnkey</a></p>
       </div>
 
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Connect WiFi</button>
-      <p class="mt-5 mb-3 text-muted text-center"><a href="https://github.com/mak3r/turnkey">Rancher Turnkey</a></p>
-    </form>
+
   </body>

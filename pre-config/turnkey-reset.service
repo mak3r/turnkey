@@ -1,0 +1,12 @@
+[Unit]
+Description=Reset the turnkey system to get user input for SSID to use
+ConditionPathExists=/boot/turnkey-reset
+After=k3s.service
+
+[Service]
+Type=simple
+ExecStartPre=rm /boot/turnkey-reset
+ExecStart=/usr/local/bin/turnkey-reset.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -113,7 +113,7 @@ def signin():
     logger.debug(ssid)
     writeWPAConfig(ssid, pwd)
     # TODO: UPDATE THIS MESSAGE BASED ON THE CONTACT METHOD USED (SMS?)
-    return render_template('restart.html', message="This device will be configured to run " + project + ".</br>You can login to this device using ssh at <b>rancher.k3s</b> with user:rancher password:rancher</br>You can also visit http://rancher.k3s from another machine on this network to download your kubeconfig file after the device restarts.")
+    return render_template('restart.html', message="This device is configured to run " + project + ". Click the button below to connect this device to the " + ssid + " network.")
 
 @app.route('/restart', methods=['POST'])
 def restart():
@@ -125,17 +125,10 @@ def restart():
     # set status down
     with open('/var/lib/rancher/turnkey/status', 'w') as f:
         f.write('down')
-    shutdown_server()
-    return 'Server shutting down...'
+    return render_template('project-info.html', message="<br>After a few minutes, you can login to this device with ssh to the host <b>raspberrypi</b>. <br></p><li>user:pi</li> <br><li>password:raspberry</li><br>Once logged in, you will find your kubeconfig file is available at <code>/home/pi/.kube/config</code>")
 
 def runapp():
     app.run(host="0.0.0.0", port=80, threaded=True)
-
-def shutdown_server():
-    func = request.environ.get('werkzeug.server.shutdown')
-    if func is None:
-        raise RuntimeError('Not running with the Werkzeug Server')
-    func()
 
 if __name__ == "__main__":
     uid = getUniqueId()

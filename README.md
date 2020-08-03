@@ -1,31 +1,41 @@
+# Overview
+This repository hosts an example solution for delivering a turnkey device to end-users who simply plug it in and provide credentials to their local network. In this example, we are simply offering easy to access to a kubernetes cluster. The solution, when complete will provide 4 options for the end user:
+1. Administrative access to a single node k3s cluster on the device (the [MVP release](https://github.com/mak3r/turnkey/releases/tag/v0.1.0-mvp))
+1. Admin access to a single node Rancher management server (WIP)
+1. Auto connection of this cluster to an existing Rancher management server (WIP)
+1. Add an agent (worker node) to an existing k3s cluster (WIP)
+
 # Why Turnkey Devices
-One of the issues for setting up branch operations is preparing the device for the site in such a way that it does not require a highly trained technician to be involved in installation, setup and configuration. In the past it was nearly unavoidable to have this done by sneaker net. The process would involve shipping a preconfigured system to a site and then, once it arrived, a specialist would come on premises for a day or sometimes a week or more to setup and configure the system. Updates/upgrades also required the sneaker net specialist.
+One of the common issues branch operations, factories, retail and the far edge have with edge solutions is how to prepare the device(s) in such a way that they do not require a highly trained technician to be involved in installation, setup and configuration. In the past it was nearly unavoidable to have this done by sneaker net. The process would involve shipping a base system to a site and then, once it arrived, a specialist would come on premises for a day or sometimes a week or more to setup and configure the system. Updates/upgrades also required the sneaker net specialist.
 
-Specialists might have expertise in networking or even be trained in the unique solution for configuration and maintenance.
+Today, consumers have become used to receiving devices which they simply use, with minimal setup from a phone app or device local website. Occasionally a user might be asked to do a firmware or security update. These updates could be done remotely without the consumer ever knowing save for privacy concerns. Under the hood, these are still very complex hardware and software solutions. 
 
-Today, we can very simply ship a device which provides a turnkey solution that is simple enough for non-technical site owners and managers to use. The advent of home automation and smart devices has paved the way for expectations of simplicity in this manner. K3s and container orchestration provide a platform to deliver.
+Enterprises with edge operations can maintain their robust software lifecycles for edge appliances while delivering the package in a turnkey manner. The idea is to provide a system in a box that is simple enough for non-technical site owners and managers to install and use while allowing the central IT department to host and manage it's updates, upgrades and features all remotely. 
 
-This repository hosts and example solution for delivering a small device to end-users who simply plug it in and provide credentials to their local network. In this example, we are creating and shipping a device whose end-user wants to have an easy to access edge kubernetes solution. The solution, when complete will provide 4 options for the end user:
-1. Administrative access to a single node k3s cluster on the device
-1. Admin access to a single node Rancher management server
-1. Auto connection of this cluster to an existing Rancher management server.
-1. Add an agent (worker node) to an existing k3s cluster
-
+The advent of home automation and smart devices has paved the way for expectations of simplicity in this manner. K3s and container orchestration provide a platform to deliver a turnkey solution that is easily installed and upgraded while being also remotely manageable and customizable.
 
 # Build
-Bootstrapping the image can be challenging for a number of reasons. The device will need a network to start so that k3s can be installed. In the future, when k3s air-gap works on Arm, it should be possible to setup a device without any network.
+Bootstrapping the image can be challenging for a number of reasons. Unless you are using one of the release images, the system will need to be internet connected to get setup. Since this particular solution is fundamentally based on managing the network interfaces from containers that are managed by k3s, automatic network connections will need to be disabled. 
+
 ## Setup - admins
-This is a list of things which need to be done in order to bootstrap the system. The actual things which are being done for bootstrapping are in the [pre-config/setup.sh](pre-config/setup.sh) script
+This is a list of things which need to be done in order to bootstrap the system. 
+### First, the OS needs to be prepped
 1. Install a raspbian buster lite image on an sdcard
 1. Configure the system for k3s
 	* Make sure cgroups is enabled in cmdline.txt add `cgroup_memory=1 cgroup_enable=memory`
+1. Disable automatic network connections
+    * on raspbian e.g. `sudo systemctl stop wpa_supplicant.service`
+
+### With a prepped OS, install k3s and the turnkey components
+The exact steps which are being done for bootstrapping are in the [pre-config/setup.sh](pre-config/setup.sh) script. Here is a rough outline
+1. Temporarily configure internet access. I used ethernet with dhcp
 1. Install k3s
-Here are some recommended options
+    Here are some recommended options:
 	* `curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--tls-san raspberrypi --write-kubeconfig /home/pi/.kube/config --no-deploy servicelb --resolv-conf /var/lib/rancher/turnkey/resolv.conf" sh -`
 	* The servicelb must be disabled
 	* A host network must be available to kubernetes
 1. Make sure there is a temporary network for k3s to startup
-    * add this to `/etc/rc.local`
+    * One way to do this is to add this to `/etc/rc.local`
 	```
 	ip link set dev eth0 up
 	ip addr add 192.168.1.1/24 brd 192.168.255.255 dev eth0
@@ -41,32 +51,22 @@ Here are some recommended options
 	nameserver 192.168.1.1
 	```
 1. Stop k3s `sudo systemctl stop k3s`
-1. Remove the turnkey communication files
-	* This clear previously scanned network entries
-	* `rm /tmp/ssid.list`
-	* `rm /tmp/status`
-
 1. Image the sd card for use in other devices
 
 # Usage
-1. When a device is shipped to the site
-    1. plug it in
-	1. turn it on 
-	1. From another device (phone, computer, etc) connect to the AP
-        * ssid: `ConfigureK3s`
-        * passphrase: `rancher-k3s` 
-    1. Navigate to `192.168.4.1` or `raspberrypi.lan`
-1. Set your network credentials in the form and submit
-    * When the device comes back up, it will have installed / deployed the selected configuration
+1. plug it in
+1. On a phone or computer connect to the `ConfigureK3s` network 
+1. Navigate to `192.168.4.1` 
+1. Set your network credentials in the form
 
 # Caveats
 * This is an example designed specificially for Raspberry Pi 4B devices running Raspbian with a 64bit kernel. It has not been tested as a generic solution for other OSes/devices.
 * The device must have a wireless card/chip capable of entering AP mode
-
 * The project is configured such that the wifi network is always managed by kubernetes
 	* it is possible to pass the network configuration to the host so it becomes permanent - it's just not done in this example
 	* this example assumes an end user might want to demo this on different wifi networks repeatedly
+* Assumptions about NIC naming are hardcoded throughout
 
-## Special thanks
-* The UI was pulled from https://github.com/schollz/raspberry-pi-turnkey
+### Special thanks
+* The UI was originally pulled from https://github.com/schollz/raspberry-pi-turnkey
 

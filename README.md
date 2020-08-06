@@ -59,6 +59,9 @@ The exact steps which are being done for bootstrapping are in the [pre-config/se
 1. Navigate to `192.168.4.1` 
 1. Set your network credentials in the form
 
+## Reset
+You can reset the device by dropping an empty file named `turnkey-reset` on the boot volume. The reset will clear the WiFi SSID list and credentials used and setup the containers for the basic turnkey usage again.
+
 # Caveats
 * This is an example designed specificially for Raspberry Pi 4B devices running Raspbian with a 64bit kernel. It has not been tested as a generic solution for other OSes/devices.
 * The device must have a wireless card/chip capable of entering AP mode

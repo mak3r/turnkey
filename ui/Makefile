@@ -10,12 +10,14 @@ publish : build
 SHELL = /bin/bash
 .ONESHELL:
 
+CUR_DIR: $(shell pwd)
+
 projects.list:
-	cat <<- EOF > /var/lib/rancher/turnkey/$@
+	cat <<- EOF > $(CUR_DIR)/$@
 		['k3s', 'Lightweight Kubernetes Cluster']
 		['Rancher', 'Rancher Management Server']
 		['k3os', 'An OS optimized for container orchestration']
 	EOF
 
 test : build projects.list
-	docker run -it --rm -v /tmp:/tmp -v /var/lib/rancher/turnkey:/var/lib/rancher/turnkey -v /var/lib/rancher/k3s/server/manifests:/var/lib/rancher/k3s/server/manifests -p 80:80 --name ui --entrypoint /bin/bash $(IMAGE):local
+	docker run -it --rm -v /tmp:/tmp -v $(CUR_DIR):/var/lib/rancher/turnkey -v /var/lib/rancher/k3s/server/manifests:/var/lib/rancher/k3s/server/manifests -p 80:80 --name ui --entrypoint /bin/bash $(IMAGE):local

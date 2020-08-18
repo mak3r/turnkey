@@ -2,11 +2,11 @@ SHELL = /bin/bash
 .ONESHELL:
 
 projects.list:
-    cat <<- EOF > $@
-        ['k3s', 'Lightweight Kubernetes Cluster']
-        ['Rancher', 'Rancher Management Server']
-        ['k3os', 'An OS optimized for container orchestration']
-    EOF
+	cat <<- EOF > $@
+		['k3s', 'Lightweight Kubernetes Cluster']
+		['Rancher', 'Rancher Management Server']
+		['k3os', 'An OS optimized for container orchestration']
+	EOF
 
 IMAGE=mak3r/turnkey-ui
 build :

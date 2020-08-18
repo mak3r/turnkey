@@ -44,11 +44,14 @@ def getssid():
 def getProjectList():
     #TODO: Read this list from a configmap
     # bind it to some actuall installation jobs
-    project_list = [
-        ['k3s', 'Lightweight Kubernetes Cluster'],
-        ['Rancher', 'Rancher Management Server'],
-        ['k3os', 'An OS optimized for container orchestration']
-    ]
+    with open("/var/lib/rancher/turnkey/projects.list", 'r') as f:
+        content = f.read()
+        project_list = content.split('\n')
+    # project_list = [
+    #     ['k3s', 'Lightweight Kubernetes Cluster'],
+    #     ['Rancher', 'Rancher Management Server'],
+    #     ['k3os', 'An OS optimized for container orchestration']
+    # ]
     return project_list
 
 def getUniqueId():
@@ -112,7 +115,6 @@ def signin():
     pwd = request.form['password']
     logger.debug(ssid)
     writeWPAConfig(ssid, pwd)
-    # TODO: UPDATE THIS MESSAGE BASED ON THE CONTACT METHOD USED (SMS?)
     return render_template('restart.html', message="This device is configured to run " + project + ". Click the button below to connect this device to the " + ssid + " network.")
 
 @app.route('/restart', methods=['POST'])

@@ -103,6 +103,8 @@ spec:
           volumeMounts:
           - mountPath: /tmp
             name: vol1
+          - mountPath: /var/lib/rancher/turnkey
+            name: vol4
         - name: has-networks
           volumeMounts:
             - mountPath: /tmp
@@ -130,12 +132,14 @@ spec:
         terminationMessagePolicy: File
         tty: true
         volumeMounts:
-        - mountPath: /var/lib/rancher/turnkey
+        - mountPath: /tmp
           name: vol1
         - mountPath: /etc/machine-id
           name: vol2
         - mountPath: /var/lib/rancher/k3s/server/manifests
           name: vol3
+        - mountPath: /var/lib/rancher/turnkey
+          name: vol4
       dnsPolicy: ClusterFirst
       restartPolicy: OnFailure
       hostNetwork: true

@@ -10,7 +10,7 @@ publish : build
 SHELL = /bin/bash
 .ONESHELL:
 
-CUR_DIR: $(shell pwd)
+CUR_DIR = $(shell pwd)
 
 projects.list:
 	cat <<- EOF > $(CUR_DIR)/$@

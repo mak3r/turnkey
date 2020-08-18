@@ -47,11 +47,6 @@ def getProjectList():
     with open("/var/lib/rancher/turnkey/projects.list", 'r') as f:
         content = f.read()
         project_list = content.split('\n')
-    # project_list = [
-    #     ['k3s', 'Lightweight Kubernetes Cluster'],
-    #     ['Rancher', 'Rancher Management Server'],
-    #     ['k3os', 'An OS optimized for container orchestration']
-    # ]
     logger.debug(project_list)
     return project_list
 
@@ -80,9 +75,10 @@ def writeWPAConfig(ssid, passphrase):
 @app.route('/')
 def main():
     logger.debug('entered main()')
-    projects = zip(*getProjectList())
+    # projects = zip(*getProjectList())
+    # next(projects)
     # TODO: UPDATE THIS TO REFLECT ACTUAL CONTACT METHOD (SMS?)
-    return render_template('index.html', ssids=getssid(), projectIDs=next(projects), message="<H3>Select a wifi network to use with this device.</H3>")
+    return render_template('index.html', ssids=getssid(), projectIDs=getProjectList(), message="<H3>Select a wifi network to use with this device.</H3>")
 
 # Captive portal when connected with iOS or Android
 @app.route('/generate_204')

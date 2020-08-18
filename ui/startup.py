@@ -52,6 +52,7 @@ def getProjectList():
     #     ['Rancher', 'Rancher Management Server'],
     #     ['k3os', 'An OS optimized for container orchestration']
     # ]
+    logger.debug(project_list)
     return project_list
 
 def getUniqueId():

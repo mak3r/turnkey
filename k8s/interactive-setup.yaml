@@ -112,7 +112,7 @@ spec:
           image: busybox:1.28
           command: ['grep', '-E', '[^\s]', /tmp/ssid.list]
       containers:
-      - image: mak3r/turnkey-ui:v0.0.24
+      - image: mak3r/turnkey-ui:v0.0.25
         imagePullPolicy: IfNotPresent
         name: ui
         ports:
@@ -139,7 +139,7 @@ spec:
         - mountPath: /var/lib/rancher/k3s/server/manifests
           name: vol3
         - mountPath: /var/lib/rancher/turnkey
-          name: vol4
+          name: project-list
       dnsPolicy: ClusterFirst
       restartPolicy: OnFailure
       hostNetwork: true
@@ -159,6 +159,13 @@ spec:
           path: /var/lib/rancher/k3s/server/manifests
           type: Directory
         name: vol3
+      - name: project-list
+        configMap:
+          name: ui-project-list
+          optional: false
+          items:
+          - key: projects.list
+            path: projects.list
 --- 
 apiVersion: v1
 kind: Service
@@ -208,3 +215,14 @@ data:
     interface wlan0
       static ip_address=192.168.4.1/24
       nohook wpa_supplicant
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-project-list
+  namespace: turnkey
+data:
+  projects.list: |
+    K3s=Lightweight Kubernetes Cluster
+    Connect to Rancher=K3s cluster connected to Rancher instance
+    Rancher=Rancher instance running on this device

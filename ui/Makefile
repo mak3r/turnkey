@@ -32,6 +32,6 @@ test : clean build projects.list ssid.list
 	docker run -it --rm -v /tmp:/tmp -v $(CUR_DIR):/var/lib/rancher/turnkey -v /var/lib/rancher/k3s/server/manifests:/var/lib/rancher/k3s/server/manifests -p 80:80 --name ui --entrypoint /bin/bash $(IMAGE):local
 
 clean: 
-	rm /tmp/ssid.list
-	rm /tmp/status
-	rm $(CUR_DIR)/projects.list
+	-rm /tmp/ssid.list
+	-rm /tmp/status
+	-rm $(CUR_DIR)/projects.list

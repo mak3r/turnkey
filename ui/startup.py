@@ -35,7 +35,7 @@ uid = ''
 def getssid():
     logger.debug('entered getssid()')
     ssid_list = []
-    with open("/var/lib/rancher/turnkey/ssid.list", 'r') as f:
+    with open("/tmp/ssid.list", 'r') as f:
         ssids = f.read()
         ssid_list = ssids.split('\n')
     logger.debug(ssid_list)
@@ -44,11 +44,14 @@ def getssid():
 def getProjectList():
     #TODO: Read this list from a configmap
     # bind it to some actuall installation jobs
-    project_list = [
-        ['k3s', 'Lightweight Kubernetes Cluster'],
-        ['Rancher', 'Rancher Management Server'],
-        ['k3os', 'An OS optimized for container orchestration']
-    ]
+    project_list = {}
+    with open("/var/lib/rancher/turnkey/projects.list", 'r') as f:
+        for line in f:
+            (key,val) = line.split("=")
+            project_list[key] = val
+        # content = f.read()
+        # project_list = content.split('\n')
+    logger.debug(project_list)
     return project_list
 
 def getUniqueId():
@@ -76,9 +79,10 @@ def writeWPAConfig(ssid, passphrase):
 @app.route('/')
 def main():
     logger.debug('entered main()')
-    projects = zip(*getProjectList())
+    # projects = zip(*getProjectList())
+    # next(projects)
     # TODO: UPDATE THIS TO REFLECT ACTUAL CONTACT METHOD (SMS?)
-    return render_template('index.html', ssids=getssid(), projectIDs=next(projects), message="<H3>Select a wifi network to use with this device.</H3>")
+    return render_template('index.html', ssids=getssid(), projectIDs=getProjectList().keys(), message="<H3>Select a wifi network to use with this device.</H3>")
 
 # Captive portal when connected with iOS or Android
 @app.route('/generate_204')
@@ -112,7 +116,6 @@ def signin():
     pwd = request.form['password']
     logger.debug(ssid)
     writeWPAConfig(ssid, pwd)
-    # TODO: UPDATE THIS MESSAGE BASED ON THE CONTACT METHOD USED (SMS?)
     return render_template('restart.html', message="This device is configured to run " + project + ". Click the button below to connect this device to the " + ssid + " network.")
 
 @app.route('/restart', methods=['POST'])
@@ -123,7 +126,7 @@ def restart():
     with open('/var/lib/rancher/k3s/server/manifests/wifi.yaml', 'w') as f:
         yaml.dump(wifi_yaml, f)
     # set status down
-    with open('/var/lib/rancher/turnkey/status', 'w') as f:
+    with open('/tmp/status', 'w') as f:
         f.write('down')
     return render_template('project-info.html', message="<br>After a few minutes, you can login to this device with ssh to the host <b>raspberrypi</b>. <br></p><li>user:pi</li> <br><li>password:raspberry</li><br>Once logged in, you will find your kubeconfig file is available at <code>/home/pi/.kube/config</code>")
 
@@ -134,7 +137,7 @@ if __name__ == "__main__":
     uid = getUniqueId()
     # write out the ui status
     # status can be one of [up|down|sleep]
-    with open('/var/lib/rancher/turnkey/status', 'w') as f:
+    with open('/tmp/status', 'w') as f:
         f.write('up')
     # fire up the input form
     runapp()

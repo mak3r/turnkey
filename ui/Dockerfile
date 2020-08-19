@@ -11,6 +11,7 @@ ADD templates /app/templates
 ADD static /app/static
 ADD wpa_supplicant /app/wpa_supplicant
 ADD action /app/action
+VOLUME [ "/tmp" ]
 VOLUME [ "/var/lib/rancher/turnkey" ]
 VOLUME [ "/var/lib/rancher/k3s/server/manifests" ]
 ENV FLASK_ENV development

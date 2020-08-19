@@ -3,7 +3,7 @@ set -x
 /usr/bin/python3 /app/startup.py &
 UIPID="$!"
 
-while [ "down" != "$(cat /var/lib/rancher/turnkey/status)" ]; do
+while [ "down" != "$(cat /tmp/status)" ]; do
 	set +x
 	sleep 2
 done

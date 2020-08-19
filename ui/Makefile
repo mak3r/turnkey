@@ -14,9 +14,9 @@ CUR_DIR = $(shell pwd)
 
 projects.list:
 	cat <<- EOF > $(CUR_DIR)/$@
-		['k3s', 'Lightweight Kubernetes Cluster']
-		['Rancher', 'Rancher Management Server']
-		['k3os', 'An OS optimized for container orchestration']
+		k3s=Lightweight Kubernetes Cluster
+		Rancher=Rancher Management Server
+		k3os=An OS optimized for container orchestration
 	EOF
 
 ssid.list:

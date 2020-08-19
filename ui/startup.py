@@ -44,9 +44,13 @@ def getssid():
 def getProjectList():
     #TODO: Read this list from a configmap
     # bind it to some actuall installation jobs
+    project_list = {}
     with open("/var/lib/rancher/turnkey/projects.list", 'r') as f:
-        content = f.read()
-        project_list = content.split('\n')
+        for line in f:
+            (key,val) = line.split("=")
+            project_list[key] = val
+        # content = f.read()
+        # project_list = content.split('\n')
     logger.debug(project_list)
     return project_list
 
@@ -78,7 +82,7 @@ def main():
     # projects = zip(*getProjectList())
     # next(projects)
     # TODO: UPDATE THIS TO REFLECT ACTUAL CONTACT METHOD (SMS?)
-    return render_template('index.html', ssids=getssid(), projectIDs=getProjectList(), message="<H3>Select a wifi network to use with this device.</H3>")
+    return render_template('index.html', ssids=getssid(), projectIDs=getProjectList().keys(), message="<H3>Select a wifi network to use with this device.</H3>")
 
 # Captive portal when connected with iOS or Android
 @app.route('/generate_204')

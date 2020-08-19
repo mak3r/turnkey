@@ -103,8 +103,6 @@ spec:
           volumeMounts:
           - mountPath: /tmp
             name: vol1
-          - mountPath: /var/lib/rancher/turnkey
-            name: vol4
         - name: has-networks
           volumeMounts:
             - mountPath: /tmp

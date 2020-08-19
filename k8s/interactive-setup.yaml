@@ -40,8 +40,6 @@ metadata:
 data:
   projects.list: |
     K3s=Lightweight Kubernetes Cluster
-    Connect to Rancher=K3s cluster connected to Rancher instance
-    Rancher=Rancher instance running on this device
 ---
 apiVersion: batch/v1
 kind: Job

@@ -12,6 +12,7 @@ SHELL = /bin/bash
 
 CUR_DIR = $(shell pwd)
 
+# used for test only
 projects.list:
 	cat <<- EOF > $(CUR_DIR)/$@
 		k3s=Lightweight Kubernetes Cluster
@@ -19,6 +20,7 @@ projects.list:
 		k3os=An OS optimized for container orchestration
 	EOF
 
+# used for test only
 ssid.list:
 	cat <<- EOF > $(CUR_DIR)/$@
 		wifi-none001

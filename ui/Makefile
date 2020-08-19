@@ -22,7 +22,7 @@ projects.list:
 
 # used for test only
 ssid.list:
-	cat <<- EOF > $(CUR_DIR)/$@
+	cat <<- EOF > /tmp/$@
 		wifi-none001
 		wifi-none002
 		wifi-none003
@@ -32,5 +32,5 @@ test : clean build projects.list ssid.list
 	docker run -it --rm -v /tmp:/tmp -v $(CUR_DIR):/var/lib/rancher/turnkey -v /var/lib/rancher/k3s/server/manifests:/var/lib/rancher/k3s/server/manifests -p 80:80 --name ui --entrypoint /bin/bash $(IMAGE):local
 
 clean: 
-	rm $(CUR_DIR)/ssid.list
+	rm /tmp/ssid.list
 	rm $(CUR_DIR)/projects.list

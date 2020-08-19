@@ -35,7 +35,7 @@ uid = ''
 def getssid():
     logger.debug('entered getssid()')
     ssid_list = []
-    with open("/var/lib/rancher/turnkey/ssid.list", 'r') as f:
+    with open("/tmp/ssid.list", 'r') as f:
         ssids = f.read()
         ssid_list = ssids.split('\n')
     logger.debug(ssid_list)
@@ -126,7 +126,7 @@ def restart():
     with open('/var/lib/rancher/k3s/server/manifests/wifi.yaml', 'w') as f:
         yaml.dump(wifi_yaml, f)
     # set status down
-    with open('/var/lib/rancher/turnkey/status', 'w') as f:
+    with open('/tmp/status', 'w') as f:
         f.write('down')
     return render_template('project-info.html', message="<br>After a few minutes, you can login to this device with ssh to the host <b>raspberrypi</b>. <br></p><li>user:pi</li> <br><li>password:raspberry</li><br>Once logged in, you will find your kubeconfig file is available at <code>/home/pi/.kube/config</code>")
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     uid = getUniqueId()
     # write out the ui status
     # status can be one of [up|down|sleep]
-    with open('/var/lib/rancher/turnkey/status', 'w') as f:
+    with open('/tmp/status', 'w') as f:
         f.write('up')
     # fire up the input form
     runapp()

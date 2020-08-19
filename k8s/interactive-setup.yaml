@@ -1,3 +1,47 @@
+--- 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ap-config
+  namespace: turnkey
+data:
+  hostapd.conf: |
+    interface=wlan0
+    driver=nl80211
+    ssid=ConfigureK3s
+    hw_mode=a
+    channel=44
+    ieee80211d=1
+    country_code=US
+    ieee80211n=1
+    ieee80211ac=1
+    wmm_enabled=0
+    macaddr_acl=0
+    auth_algs=1
+    ignore_broadcast_ssid=0
+    #wpa=2
+    #wpa_passphrase=rancher-k3s
+    #wpa_key_mgmt=WPA-PSK
+    #wpa_pairwise=TKIP
+    #rsn_pairwise=CCMP
+  dnsmasq.conf: |
+    interface=wlan0
+    dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
+  dhcpcd.conf: |
+    interface wlan0
+      static ip_address=192.168.4.1/24
+      nohook wpa_supplicant
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-project-list
+  namespace: turnkey
+data:
+  projects.list: |
+    K3s=Lightweight Kubernetes Cluster
+    Connect to Rancher=K3s cluster connected to Rancher instance
+    Rancher=Rancher instance running on this device
 ---
 apiVersion: batch/v1
 kind: Job
@@ -180,47 +224,3 @@ spec:
     turnkey/workloadselector: job-turnkey-ui
   sessionAffinity: None
   type: ClusterIP
---- 
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ap-config
-  namespace: turnkey
-data:
-  hostapd.conf: |
-    interface=wlan0
-    driver=nl80211
-    ssid=ConfigureK3s
-    hw_mode=a
-    channel=44
-    ieee80211d=1
-    country_code=US
-    ieee80211n=1
-    ieee80211ac=1
-    wmm_enabled=0
-    macaddr_acl=0
-    auth_algs=1
-    ignore_broadcast_ssid=0
-    #wpa=2
-    #wpa_passphrase=rancher-k3s
-    #wpa_key_mgmt=WPA-PSK
-    #wpa_pairwise=TKIP
-    #rsn_pairwise=CCMP
-  dnsmasq.conf: |
-    interface=wlan0
-    dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
-  dhcpcd.conf: |
-    interface wlan0
-      static ip_address=192.168.4.1/24
-      nohook wpa_supplicant
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ui-project-list
-  namespace: turnkey
-data:
-  projects.list: |
-    K3s=Lightweight Kubernetes Cluster
-    Connect to Rancher=K3s cluster connected to Rancher instance
-    Rancher=Rancher instance running on this device

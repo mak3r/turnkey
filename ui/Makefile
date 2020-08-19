@@ -33,4 +33,5 @@ test : clean build projects.list ssid.list
 
 clean: 
 	rm /tmp/ssid.list
+	rm /tmp/status
 	rm $(CUR_DIR)/projects.list
